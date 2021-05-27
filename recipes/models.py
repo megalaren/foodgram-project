@@ -1,4 +1,5 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -29,6 +30,9 @@ class Tag(models.Model):
         default=Color.GREEN,
     )
 
+    def __str__(self):
+        return self.name
+
 
 class Ingredient(models.Model):
     title = models.CharField(
@@ -39,6 +43,9 @@ class Ingredient(models.Model):
         verbose_name='Единица измерения',
         max_length=50,
     )
+
+    def __str__(self):
+        return self.title
 
 
 class Recipe(models.Model):
@@ -81,6 +88,19 @@ class Recipe(models.Model):
         verbose_name='Ингредиент',
     )
 
+    @admin.display()
+    def get_tags(self):
+        result = ''
+        for tag in self.tags.all():
+            result += tag.name + '\n'
+        return result
+
+    class Meta:
+        ordering = ('-pub_date',)
+
+    def __str__(self):
+        return self.title
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
@@ -93,12 +113,17 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Ингредиент'
     )
-    quantity = models.DecimalField(
+    quantity = models.PositiveSmallIntegerField(
         verbose_name='Количество',
-        max_digits=6,
-        decimal_places=1,
         null=True,
         blank=True,
         validators=[
             MinValueValidator(0)]
     )
+
+    @admin.display()
+    def unit(self):
+        return self.ingredient.unit
+
+    def __str__(self):
+        return f'[{self.recipe}, {self.ingredient}, {self.quantity}]'
