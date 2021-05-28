@@ -6,4 +6,7 @@ urlpatterns = [
     path('',
          views.index,
          name='index'),
+    path('<int:recipe_id>/',
+         views.recipe_view,
+         name='recipe'),
 ]
