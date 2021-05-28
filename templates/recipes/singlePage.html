@@ -12,11 +12,13 @@
     <div class="single-card__info">
       <div class="single-card__header-info">
         <h1 class="single-card__title">{{ recipe.title }}</h1>
-        <div class="single-card__favorite">
-          <button class="button button_style_none" name="favorites" data-out><span
-              class="icon-favorite icon-favorite_big"></span></button>
-          <div class="single-card__favorite-tooltip tooltip">Добавить в избранное</div>
-        </div>
+        {% if user.is_authenticated %}
+          <div class="single-card__favorite">
+            <button class="button button_style_none" name="favorites" data-out><span
+                class="icon-favorite icon-favorite_big"></span></button>
+            <div class="single-card__favorite-tooltip tooltip">Добавить в избранное</div>
+          </div>
+        {% endif %}
       </div>
       <ul class="single-card__items">
         {% for tag in recipe.tags.all %}
@@ -29,21 +31,27 @@
           <li class="single-card__item"><p class="single-card__text">
             <span class="icon-user"></span> {{ recipe.author.first_name }} {{ recipe.author.last_name }}
           </p></li>
-          <li class="single-card__item"><a style="margin-left: 2.5em" href="#" class="single-card__text">Редактировать
-            рецепт</a></li>
+          {% if recipe.author == user %}
+            <li class="single-card__item">
+              <a style="margin-left: 2.5em" href="#" class="single-card__text">Редактировать рецепт</a>
+            </li>
+          {% endif %}
         </ul>
       </div>
       <ul class="single-card__items">
+
         <li class="single-card__item">
           <button class="button button_style_blue" name="purchases" data-out>
             <span class="icon-plus"></span> Добавить в покупки
           </button>
         </li>
-        <li class="single-card__item">
-          <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
-            Подписаться на автора
-          </button>
-        </li>
+        {% if user.is_authenticated %}
+          <li class="single-card__item">
+            <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
+              Подписаться на автора
+            </button>
+          </li>
+        {% endif %}
       </ul>
       <div class="single-card__section">
         <h3 class="single-card__section-title">Ингредиенты:</h3>
@@ -75,5 +83,8 @@
   <script src="{% static 'js/components/Header.js' %}"></script>
 
   <script src="{% static 'js/api/Api.js' %}"></script>
+  {# со скриптами может надо сложнее логику #}
   <script src="{% static 'singlePage.js' %}"></script>
+{#  <script src="{% static 'singlePageNotAuth.js' %}"></script>#}
 {% endblock %}
+
