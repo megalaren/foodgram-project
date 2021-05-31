@@ -27,12 +27,6 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
     ordering = ['pk']
 
 
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'username', 'email', 'first_name', 'last_name')
-    ordering = ['username']
-
-
-admin.site.register(User, UserAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Ingredient, IngredientAdmin)
 admin.site.register(Recipe, RecipeAdmin)
