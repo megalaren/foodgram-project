@@ -104,6 +104,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Login
+LOGIN_URL = '/auth/login/'
+LOGIN_REDIRECT_URL = 'index'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
