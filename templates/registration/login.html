@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Войти на сайт{% endblock %}
+
+{% load static %}
+{% block static %} <link rel="stylesheet" href="{% static 'pages/form.css' %}"> {% endblock %}
+
+{% block content %}
+  {% load user_filters %}
+  <div class="main__header">
+    <h1 class="main__title">Войти на сайт</h1>
+  </div>
+  <div class="form-container">
+
+    <form class="form" method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+
+      <div class="form__group">
+        <label for="id_username" class="form__label">Имя пользователя</label>
+        <div class="form__field-group">
+          <input type="text" name="username" id="id_username" class="form__input">
+          {% if form.username.errors %}
+            {% for error in form.username.errors %}
+              <span class="form__error">{{ error|escape }}</span>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form__group">
+        <label for="id_password" class="form__label">Пароль</label>
+        <div class="form__field-group">
+          <input type="password" name="password" id="id_password" class="form__input">
+          {% if form.password.errors %}
+            {% for error in form.password.errors %}
+              <span class="form__error">{{ error|escape }}</span>
+            {% endfor %}
+          {% endif %}
+          {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+              <span class="form__error">{{ error|escape }}</span>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form__footer">
+        <button class="button button_style_blue">Войти</button>
+        <a class="form__forgot-link">Забыли пароль?</a>
+      </div>
+    </form>
+  </div>
+
+{% endblock %}

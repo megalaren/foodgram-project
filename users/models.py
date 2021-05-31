@@ -3,7 +3,10 @@ from django.db import models
 
 
 class User(AbstractUser):
-    email = models.EmailField('email address', unique=True)
+    email = models.EmailField(
+        verbose_name='Адрес электронной почты',
+        unique=True,
+    )
 
     class Meta:
         ordering = ('pk',)
