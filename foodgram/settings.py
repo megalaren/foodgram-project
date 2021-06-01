@@ -104,6 +104,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
 # Login
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = 'index'
