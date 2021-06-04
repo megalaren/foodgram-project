@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
 from django.db import models
 
 from recipes.models import Ingredient, Recipe
@@ -35,6 +34,9 @@ class Favorite(models.Model):
         on_delete=models.CASCADE,
         related_name='favorites',
     )
+
+    class Meta:
+        unique_together = ('recipe', 'user')
 
 
 class Purchase(models.Model):
