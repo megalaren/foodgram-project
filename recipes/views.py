@@ -10,9 +10,12 @@ User = get_user_model()
 
 def index(request):
     recipes = Recipe.objects.select_related('author')
-    if request.user.is_authenticated:
+    user = request.user
+    purchases_count = 0
+    if user.is_authenticated:
+        purchases_count = user.purchases.count()
         favorites_recipes = Favorite.objects.filter(
-            user=request.user,
+            user=user,
             recipe=OuterRef('pk')
         )
         purchases_recipes = Purchase.objects.filter(
@@ -24,9 +27,11 @@ def index(request):
             is_purchase=Exists(purchases_recipes))
 
     all_tags = Tag.objects.all()
+
     return render(request, 'recipes/index.html', {
         'recipes': recipes,
         'all_tags': all_tags,
+        'purchases_count': purchases_count
     })
 
 
