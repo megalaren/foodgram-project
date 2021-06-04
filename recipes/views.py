@@ -35,6 +35,31 @@ def index(request):
     })
 
 
+def profile_view(request, username):
+    author = get_object_or_404(User, username=username)
+    recipes = author.recipes.all()
+    user = request.user
+    purchases_count = 0
+    if user.is_authenticated:
+        purchases_count = user.purchases.count()
+        favorites_recipes = Favorite.objects.filter(user=user,
+            recipe=OuterRef('pk'))
+        purchases_recipes = Purchase.objects.filter(user=request.user,
+            recipe=OuterRef('pk'))
+        recipes = recipes.annotate(
+            is_favorite=Exists(favorites_recipes)).annotate(
+            is_purchase=Exists(purchases_recipes))
+
+    all_tags = Tag.objects.all()
+
+    return render(request, 'recipes/authorRecipe.html', {
+        'all_tags': all_tags,
+        'author': author,
+        'purchases_count': purchases_count,
+        'recipes': recipes,
+    })
+
+
 def recipe_view(request, recipe_id):
     recipe = get_object_or_404(
         Recipe.objects.select_related('author'),
