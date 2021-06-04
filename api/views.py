@@ -3,30 +3,26 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
 from .models import Favorite, Follow, Purchase
-from .serializers import FavoriteSerializer
+from .serializers import FavoriteSerializer, PurchaseSerializer
 
 User = get_user_model()
 
 UNKNOWN_ERROR = 'Произошла неизвестная ошибка'
 
 
-class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
-    lookup_field = 'recipe'
-    serializer_class = FavoriteSerializer
-
-    def get_queryset(self):
-        return Favorite.objects.filter(user=self.request.user)
-
+class CreateDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                           viewsets.GenericViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
             return Response(
                 {'success': False, 'detail': serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST, )
-        if not Favorite.objects.filter(
-                user=request.user,
-                recipe=serializer.validated_data['recipe']).exists():
+        is_exists = self.get_queryset().filter(
+            user=request.user,
+            **{self.lookup_field: serializer.validated_data[self.lookup_field]}
+        ).exists()
+        if not is_exists:
             serializer.save(user=request.user)
         return Response({'success': True}, status=status.HTTP_200_OK)
 
@@ -37,3 +33,19 @@ class FavoriteViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                 {'success': False, 'detail': UNKNOWN_ERROR},
                 status=status.HTTP_400_BAD_REQUEST,)
         return Response({'success': True}, status=status.HTTP_200_OK)
+
+
+class FavoriteViewSet(CreateDestroyViewSet):
+    lookup_field = 'recipe'
+    serializer_class = FavoriteSerializer
+
+    def get_queryset(self):
+        return Favorite.objects.filter(user=self.request.user)
+
+
+class PurchaseViewSet(CreateDestroyViewSet):
+    lookup_field = 'recipe'
+    serializer_class = PurchaseSerializer
+
+    def get_queryset(self):
+        return Purchase.objects.filter(user=self.request.user)
