@@ -57,7 +57,7 @@ class Api {
         'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
       },
       body: JSON.stringify({
-        id: id
+        author: id
       })
     })
       .then( e => {
