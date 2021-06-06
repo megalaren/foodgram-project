@@ -3,7 +3,8 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.response import Response
 
 from .models import Favorite, Follow, Purchase
-from .serializers import FavoriteSerializer, PurchaseSerializer
+from .serializers import (FavoriteSerializer, FollowSerializer,
+                          PurchaseSerializer)
 
 User = get_user_model()
 
@@ -41,6 +42,14 @@ class FavoriteViewSet(CreateDestroyViewSet):
 
     def get_queryset(self):
         return Favorite.objects.filter(user=self.request.user)
+
+
+class FollowViewSet(CreateDestroyViewSet):
+    lookup_field = 'author'
+    serializer_class = FollowSerializer
+
+    def get_queryset(self):
+        return Follow.objects.filter(user=self.request.user)
 
 
 class PurchaseViewSet(CreateDestroyViewSet):

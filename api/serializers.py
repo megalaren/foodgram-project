@@ -9,6 +9,12 @@ class FavoriteSerializer(serializers.ModelSerializer):
         fields = ('recipe', )
 
 
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Follow
+        fields = ('author', )
+
+
 class PurchaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Purchase

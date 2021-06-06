@@ -20,6 +20,9 @@ class Follow(models.Model):
         related_name='follower',
     )
 
+    class Meta:
+        unique_together = ('author', 'user')
+
 
 class Favorite(models.Model):
     recipe = models.ForeignKey(
@@ -52,3 +55,6 @@ class Purchase(models.Model):
         verbose_name='Рецепт',
         related_name='purchases'
     )
+
+    class Meta:
+        unique_together = ('recipe', 'user')
