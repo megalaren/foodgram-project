@@ -30,8 +30,8 @@
             <li class="nav__item {% if url_name == 'follow_index' %}nav__item_active{% endif %}">
               <a href="{% url 'follow_index' %}" class="nav__link link">Мои подписки</a>
             </li>
-            <li class="nav__item {% if url_name == '' %}nav__item_active{% endif %}">
-              <a href="#" class="nav__link link">Создать рецепт</a>
+            <li class="nav__item {% if url_name == 'new_recipe' %}nav__item_active{% endif %}">
+              <a href="{% url 'new_recipe' %}" class="nav__link link">Создать рецепт</a>
             </li>
             <li class="nav__item {% if url_name == 'favorite' %}nav__item_active{% endif %}">
               <a href="{% url 'favorite' %}" class="nav__link link">Избранное</a>

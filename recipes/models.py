@@ -39,7 +39,7 @@ class Ingredient(models.Model):
         verbose_name='Название ингредиента',
         max_length=50,
     )
-    unit = models.CharField(
+    dimension = models.CharField(
         verbose_name='Единица измерения',
         max_length=50,
     )
@@ -124,8 +124,8 @@ class RecipeIngredient(models.Model):
     )
 
     @admin.display()
-    def unit(self):
-        return self.ingredient.unit
+    def dimension(self):
+        return self.ingredient.dimension
 
     def __str__(self):
         return f'[{self.recipe}, {self.ingredient}, {self.quantity}]'

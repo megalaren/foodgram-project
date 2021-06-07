@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Exists, F, OuterRef
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 
+from .forms import RecipeForm
 from .models import Recipe, Tag
 from api.models import Favorite, Follow, Purchase
 
@@ -66,6 +67,24 @@ def follow_index(request):
     })
 
 
+@login_required
+def new_recipe(request):
+    form = RecipeForm(request.POST or None, files=request.FILES or None, )
+    print(request.POST)
+    # for field in form:
+    #     print(field.id_for_label, field.name, field.widget_type)
+    if not form.is_valid():
+        all_tags = Tag.objects.all()
+        return render(request, 'recipes/formRecipe.html', {
+            'form': form,
+            'all_tags': all_tags,
+        })
+    recipe = form.save(commit=False)
+    recipe.author = request.user
+    recipe.save()
+    return redirect('recipe', recipe.id)
+
+
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     recipes = author.recipes.all()
@@ -102,7 +121,7 @@ def recipe_view(request, recipe_id):
 
     ingredients = recipe.ingredients_count.annotate(
         title=F('ingredient__title'),
-        unit=F('ingredient__unit')
+        dimension=F('ingredient__dimension')
     )
     return render(request, 'recipes/singlePage.html', {
         'author': author,

@@ -116,9 +116,10 @@ class Api {
         })
   }
     getIngredients  (text)  {
-        return fetch(`${this.apiUrl}/ingredients?query=${text}/`, {
+        return fetch(`${this.apiUrl}/ingredients?query=${text}`, {
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': document.getElementsByName('csrfmiddlewaretoken')[0].value,
             }
         })
             .then( e => {
