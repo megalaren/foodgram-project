@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
-from rest_framework import mixins, status, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.response import Response
 
 from .models import Favorite, Follow, Purchase
+from recipes.models import Ingredient
 from .serializers import (FavoriteSerializer, FollowSerializer,
-                          PurchaseSerializer)
+                          IngredientSerializer, PurchaseSerializer)
 
 User = get_user_model()
 
@@ -34,6 +35,13 @@ class CreateDestroyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
                 {'success': False, 'detail': UNKNOWN_ERROR},
                 status=status.HTTP_400_BAD_REQUEST,)
         return Response({'success': True}, status=status.HTTP_200_OK)
+
+
+class IngredientViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('^title',)
 
 
 class FavoriteViewSet(CreateDestroyViewSet):

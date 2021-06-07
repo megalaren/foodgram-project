@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'sorl.thumbnail',
 ]
 
@@ -99,6 +100,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'SEARCH_PARAM': 'query',
 }
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

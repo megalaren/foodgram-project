@@ -12,7 +12,7 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'title', 'unit')
+    list_display = ('pk', 'title', 'dimension')
     ordering = ['title']
 
 
@@ -23,7 +23,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'recipe', 'ingredient', 'quantity', 'unit')
+    list_display = ('pk', 'recipe', 'ingredient', 'quantity', 'dimension')
     ordering = ['pk']
 
 
