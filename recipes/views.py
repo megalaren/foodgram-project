@@ -4,7 +4,7 @@ from django.db.models import Count, Exists, F, OuterRef
 from django.shortcuts import get_object_or_404, render, redirect
 
 from .forms import RecipeForm
-from .models import Recipe, Tag
+from .models import Ingredient, Recipe, RecipeIngredient, Tag
 from api.models import Favorite, Follow, Purchase
 
 User = get_user_model()
@@ -25,6 +25,49 @@ def get_recipes_for_index(recipes, user):
         is_purchase=Exists(purchases_recipes)
     )
     return recipes
+
+
+def get_tags_from_request(request, all_tags):
+    """Возвращает тэги из all_tags, slug которых есть в request."""
+    slugs_of_tags = [tag.slug for tag in all_tags]
+    keys = [key for key in request.POST if key in slugs_of_tags]
+    return Tag.objects.filter(slug__in=keys)
+
+
+def get_ingredients_from_request(request):
+    """Возвращает ингредиенты, их количество и id для шаблона."""
+    data = request.POST
+    ingredients = []
+    for key in data:
+        if not key.startswith('nameIngredient'):
+            continue
+        ingredient_index = key.strip('nameIngredient_')
+        quantity_str = data.get(f'valueIngredient_{ingredient_index}')
+        if not quantity_str.isdigit():
+            continue
+        quantity = int(quantity_str)
+        try:
+            ingredient = Ingredient.objects.get(title=data.get(key))
+        except Ingredient.DoesNotExist:
+            continue
+        ingredients.append({
+            'id': ingredient_index,
+            'ingredient': ingredient,
+            'quantity': quantity,
+        })
+    return ingredients
+
+
+def save_ingredients_and_tags(recipe, ingredients, tags):
+    """Сохраняет тэги и ингредиенты в рецепт."""
+    for tag in tags:
+        recipe.tags.add(tag)
+    for ingredient in ingredients:
+        RecipeIngredient.objects.create(
+            recipe=recipe,
+            ingredient=ingredient['ingredient'],
+            quantity=ingredient['quantity'],
+        )
 
 
 def index(request):
@@ -69,19 +112,28 @@ def follow_index(request):
 
 @login_required
 def new_recipe(request):
-    form = RecipeForm(request.POST or None, files=request.FILES or None, )
-    print(request.POST)
-    # for field in form:
-    #     print(field.id_for_label, field.name, field.widget_type)
-    if not form.is_valid():
-        all_tags = Tag.objects.all()
+    all_tags = Tag.objects.all()
+    if request.method != 'POST':
         return render(request, 'recipes/formRecipe.html', {
-            'form': form,
+            'form': RecipeForm(),
             'all_tags': all_tags,
         })
+    form = RecipeForm(request.POST or None, files=request.FILES or None, )
+    recipe_tags = get_tags_from_request(request, all_tags)
+    ingredients = get_ingredients_from_request(request)
+
+    if not form.is_valid():
+        return render(request, 'recipes/formRecipe.html', {
+            'all_tags': all_tags,
+            'form': form,
+            'ingredients': ingredients,
+            'recipe_tags': recipe_tags,
+        })
+    # если валидна, то сохраняем рецепт и добавляем в него тэги и ингредиенты
     recipe = form.save(commit=False)
     recipe.author = request.user
     recipe.save()
+    save_ingredients_and_tags(recipe, ingredients, recipe_tags)
     return redirect('recipe', recipe.id)
 
 

@@ -24,8 +24,8 @@ class Subscribe {
         this.api.removeSubscriptions(authorId)
             .then( e => {
                 target.innerHTML = this.config.default.text;
-                target.classList.add(this.config.default.class);
                 target.classList.remove(this.config.active.class);
+                target.classList.add(this.config.default.class);
                 target.setAttribute(this.config.attr, true);
             })
             .catch( e => {

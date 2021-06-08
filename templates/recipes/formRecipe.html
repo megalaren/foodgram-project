@@ -26,7 +26,7 @@
         <label for="{{ form.title.id_for_label }}" class="form__label">Название рецепта</label>
         <div class="form__field-group">
           {{ form.title|add_class:"form__input" }}
-{#          <input type="text" id="id_title" name="form.title.name" class="form__input">#}
+          {#          <input type="text" id="id_title" name="form.title.name" class="form__input">#}
           {% if form.title.errors %}
             {% for error in form.title.errors %}
               <span class="form__error">{{ error|escape }}</span>
@@ -39,21 +39,16 @@
         <p class="form__label">Теги</p>
         <div class="form__field-group">
           <div class="tags">
-            <div class="tags__item">
-              <input type="checkbox" name="breakfast" id="id_breakfast"
-                     class="tags__checkbox tags__checkbox_style_orange">
-              <label for="id_breakfast" class="tags__label">Завтрак</label>
-            </div>
-            <div class="tags__item">
-              <input type="checkbox" name="lunch" id="id_lunch" class="tags__checkbox tags__checkbox_style_green"
-                     checked>
-              <label for="id_lunch" class="tags__label">Обед</label>
-            </div>
-            <div class="tags__item">
-              <input type="checkbox" name="dinner" id="id_dinner" class="tags__checkbox tags__checkbox_style_purple"
-                     checked>
-              <label for="id_dinner" class="tags__label">Ужин</label>
-            </div>
+
+            {% for tag in all_tags %}
+              <div class="tags__item">
+                <input type="checkbox" name="{{ tag.slug }}" id="id_{{ tag.slug }}"
+                       class="tags__checkbox tags__checkbox_style_{{ tag.color }}"
+                       {% if tag in recipe_tags %}checked{% endif %}>
+                <label for="id_{{ tag.slug }}" class="tags__label">{{ tag.name }}</label>
+              </div>
+            {% endfor %}
+
           </div>
           {% if form.tags.errors %}
             {% for error in form.tags.errors %}
@@ -74,14 +69,20 @@
             <input type="number" id="cantidad" class="form__input" min="0">
             <label for="cantidad" class="form__label" id="cantidadVal">шт.</label>
           </div>
+
           <div class="form__field-group-ingredientes-container">
-          </div>
-          <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
-          {% if form.ingredients.errors %}
-            {% for error in form.ingredients.errors %}
-              <span class="form__error">{{ error|escape }}</span>
+            {% for ingredient in ingredients %}
+              <div class="form__field-item-ingredient" id="ing_{{ ingredient.id }}">
+                <span>{{ ingredient.ingredient.title }} {{ ingredient.quantity }}{{ ingredient.ingredient.dimension }}</span>
+                <span class="form__field-item-delete"></span>
+                <input id="nameIngredient_{{ ingredient.id }}" name="nameIngredient_{{ ingredient.id }}" type="hidden" value="{{ ingredient.ingredient.title }}">
+                <input id="unitsIngredient_{{ ingredient.id }}" name="unitsIngredient_{{ ingredient.id }}" type="hidden" value="{{ ingredient.ingredient.dimension }}">
+                <input id="valueIngredient_{{ ingredient.id }}" name="valueIngredient_{{ ingredient.id }}" type="hidden" value="{{ ingredient.quantity }}">
+              </div>
             {% endfor %}
-          {% endif %}
+          </div>
+
+          <span class="form__ingredient-link" id="addIng">Добавить ингредиент</span>
         </div>
       </div>
 
@@ -101,9 +102,9 @@
       <div class="form__group">
         <label for="id_description" class="form__label">Описание</label>
         <div class="form__field-group">
-{#          {{ form.description|add_class:"form__textarea" }}#}
-          <textarea name="description" required id="id_description" rows="8"
-                    class="form__textarea">{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
+          <textarea name="description" id="id_description" rows="8"
+                    class="form__textarea">{% if form.description.value %}
+            {{ form.description.value }}{% endif %}</textarea>
           {% if form.description.errors %}
             {% for error in form.description.errors %}
               <span class="form__error">{{ error|escape }}</span>
@@ -115,7 +116,7 @@
       <div class="form__group">
         <span class="form__label">Загрузить фото</span>
         <div class="form__field-group">
-          <input type="file" name="file" id="id_file">
+          <input type="file" name="image" required id="id_image">
           {% if form.image.errors %}
             {% for error in form.image.errors %}
               <span class="form__error">{{ error|escape }}</span>
