@@ -9,4 +9,5 @@ User = get_user_model()
 class RecipeForm(forms.ModelForm):
     class Meta:
         model = Recipe
-        fields = ('title', 'description', 'image', 'cooking_time',)
+        fields = (
+            'title', 'description', 'ingredients', 'image', 'cooking_time',)
