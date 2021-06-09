@@ -75,8 +75,6 @@ class Recipe(models.Model):
     image = models.ImageField(
         upload_to='recipes/',
         help_text='Можете добавить картинку',
-        blank=True,
-        null=True
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления в минутах',
@@ -86,6 +84,7 @@ class Recipe(models.Model):
         Ingredient,
         through='RecipeIngredient',
         verbose_name='Ингредиент',
+        blank=True,
     )
 
     @admin.display()
@@ -118,10 +117,12 @@ class RecipeIngredient(models.Model):
     quantity = models.PositiveSmallIntegerField(
         verbose_name='Количество',
         null=True,
-        blank=True,
         validators=[
             MinValueValidator(0)]
     )
+
+    class Meta:
+        unique_together = ('ingredient', 'recipe')
 
     @admin.display()
     def dimension(self):
