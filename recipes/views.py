@@ -1,14 +1,14 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-
 from django.db.models import Count, F
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
 
 from .forms import RecipeForm
 from .models import Recipe, Tag
 from .utils import (get_ingredients_from_recipe, get_ingredients_from_request,
-                    get_tags_from_request, get_recipes_for_index,
-                    save_ingredients_and_tags)
+                    get_shop_list_pdf_binary, get_tags_from_request,
+                    get_recipes_for_index, save_ingredients_and_tags)
 from api.models import Favorite, Follow, Purchase
 
 User = get_user_model()
@@ -184,3 +184,33 @@ def recipe_view(request, recipe_id):
         'is_follow': is_follow,
         'is_purchase': is_purchase,
     })
+
+
+@login_required
+def shop_list(request):
+    recipes = Recipe.objects.filter(purchases__user=request.user)
+    return render(request, 'recipes/shopList.html', {
+        'recipes': recipes,
+    })
+
+
+@login_required
+def shop_list_download(request):
+    ingredients = {}
+    recipes = Recipe.objects.filter(purchases__user=request.user)
+    for recipe in recipes:
+        for recipe_ingredient in recipe.ingredients_count.all():
+            title = recipe_ingredient.ingredient.title
+            if title not in ingredients:
+                ingredients[title] = {
+                    'quantity': recipe_ingredient.quantity,
+                    'dimension': recipe_ingredient.ingredient.dimension,
+                }
+            else:
+                ingredients[title]['quantity'] += recipe_ingredient.quantity
+
+    return FileResponse(
+        get_shop_list_pdf_binary(ingredients),
+        filename='Shop_list.pdf',
+        as_attachment=True
+    )
