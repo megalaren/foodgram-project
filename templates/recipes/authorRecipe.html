@@ -9,7 +9,7 @@
 
   <div class="main__header">
     <h1 class="main__title">{{ author.first_name }} {{ author.last_name }}</h1>
-    {% include "tags.html" with all_tags=all_tags %}
+    {% include "tags.html" %}
   </div>
 
   <div class="author-subscribe" data-author="{{ author.id }}">

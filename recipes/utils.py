@@ -26,6 +26,16 @@ FONT_FILE = os.path.join(fonts, 'DejaVuSansCondensed.ttf')
 BOLD_FONT_FILE = os.path.join(fonts, 'DejaVuSansCondensed-Bold.ttf')
 
 
+def get_tag_filtered_recipes(request, recipes, all_tags):
+    """Возвращает отфильтрованные по тегам рецепты и список тегов."""
+    active_tags = all_tags
+    tags = request.GET.getlist('tags')
+    if tags:
+        active_tags = active_tags.filter(id__in=tags)
+        recipes = recipes.filter(tags__in=active_tags).distinct()
+    return recipes, active_tags
+
+
 def get_recipes_for_index(recipes, user):
     """Возвращает рецепты с полями is_favorite и is_purchase."""
     favorites_recipes = Favorite.objects.filter(
