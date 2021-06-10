@@ -27,4 +27,10 @@ urlpatterns = [
     path('recipe_delete/<int:recipe_id>/',
          views.recipe_delete,
          name='recipe_delete'),
+    path('shop_list/download/',
+         views.shop_list_download,
+         name='shop_list_download'),
+    path('shop_list/',
+         views.shop_list,
+         name='shop_list'),
 ]
