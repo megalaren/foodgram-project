@@ -6,9 +6,12 @@ from django.shortcuts import get_object_or_404, render, redirect
 
 from .forms import RecipeForm
 from .models import Recipe, Tag
-from .utils import (get_ingredients_from_recipe, get_ingredients_from_request,
-                    get_shop_list_pdf_binary, get_tags_from_request,
-                    get_recipes_for_index, save_ingredients_and_tags)
+from .utils import (
+    get_ingredients_from_recipe, get_ingredients_from_request,
+    get_shop_list_pdf_binary, get_tag_filtered_recipes, get_tags_from_request,
+    get_recipes_for_index, save_ingredients_and_tags
+)
+
 from api.models import Favorite, Follow, Purchase
 
 User = get_user_model()
@@ -16,14 +19,17 @@ User = get_user_model()
 
 def index(request):
     recipes = Recipe.objects.select_related('author')
+    all_tags = Tag.objects.all()
+    recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
+
     user = request.user
     if user.is_authenticated:
         recipes = get_recipes_for_index(recipes, user)
-    all_tags = Tag.objects.all()
 
     return render(request, 'recipes/index.html', {
         'recipes': recipes,
         'all_tags': all_tags,
+        'active_tags': active_tags,
     })
 
 
@@ -32,12 +38,13 @@ def favorite(request):
     user = request.user
     recipes = Recipe.objects.filter(
         favorites__user=user).select_related('author')
-    recipes = get_recipes_for_index(recipes, user)
     all_tags = Tag.objects.all()
-
+    recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
+    recipes = get_recipes_for_index(recipes, user)
     return render(request, 'recipes/favorite.html', {
         'recipes': recipes,
         'all_tags': all_tags,
+        'active_tags': active_tags,
     })
 
 
@@ -57,18 +64,21 @@ def follow_index(request):
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     recipes = author.recipes.all()
+    all_tags = Tag.objects.all()
+    recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
+
     user = request.user
     is_follow = False
     if user.is_authenticated:
         recipes = get_recipes_for_index(recipes, user)
         is_follow = Follow.objects.filter(user=user, author=author).exists()
-    all_tags = Tag.objects.all()
 
     return render(request, 'recipes/authorRecipe.html', {
         'all_tags': all_tags,
         'author': author,
         'is_follow': is_follow,
         'recipes': recipes,
+        'active_tags': active_tags,
     })
 
 

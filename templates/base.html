@@ -12,69 +12,69 @@
   {% endblock %}
 </head>
 
-<body class="body">
-<header class="header">
-  <nav class="nav">
-    <div class="nav__container container">
-      {% with url_name=request.resolver_match.url_name %}
-        <ul class="nav__items list">
-          {% if url_name == 'recipe' or url_name == 'index' or url_name == 'profile' %}
-            <li class="nav__item nav__item_active">
-          {% elif not user.is_authenticated %}
-              <li class="nav__item nav__item_disabled">
-          {% else %}
-            <li class="nav__item">
-          {% endif %}
-              <a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
-          {% if user.is_authenticated %}
-            <li class="nav__item {% if url_name == 'follow_index' %}nav__item_active{% endif %}">
-              <a href="{% url 'follow_index' %}" class="nav__link link">Мои подписки</a>
-            </li>
-            <li class="nav__item {% if url_name == 'new_recipe' %}nav__item_active{% endif %}">
-              <a href="{% url 'new_recipe' %}" class="nav__link link">Создать рецепт</a>
-            </li>
-            <li class="nav__item {% if url_name == 'favorite' %}nav__item_active{% endif %}">
-              <a href="{% url 'favorite' %}" class="nav__link link">Избранное</a>
-            </li>
-            <li class="nav__item {% if url_name == 'shop_list' %}nav__item_active{% endif %}">
-              <a href="{% url 'shop_list' %}" class="nav__link link">Список покупок</a>
-              <span class="badge badge_style_blue nav__badge" id="counter">{{ user.purchases.count }}</span>
-            </li>
-          {% endif %}
-        </ul>
-        <ul class="nav__items list">
-          {% if user.is_authenticated %}
-            <li class="nav__item"><a href="{% url 'password_change' %}" class="nav__link link">Изменить пароль</a></li>
-            <li class="nav__item"><a href="{% url 'logout' %}" class="nav__link link">Выход</a></li>
-          {% else %}
-            <li class="nav__item"><a href="{% url 'login' %}" class="nav__link link">Войти</a></li>
-            <li class="nav__item"><a href="{% url 'signup' %}" class="button button_style_blue">Создать аккаунт</a></li>
-          {% endif %}
-        </ul>
-      {% endwith %}
+{% with url_name=request.resolver_match.url_name %}
+  <body class="body">
+  <header class="header">
+    <nav class="nav">
+      <div class="nav__container container">
+          <ul class="nav__items list">
+            {% if url_name == 'recipe' or url_name == 'index' or url_name == 'profile' %}
+              <li class="nav__item nav__item_active">
+            {% elif not user.is_authenticated %}
+                <li class="nav__item nav__item_disabled">
+            {% else %}
+              <li class="nav__item">
+            {% endif %}
+                <a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
+            {% if user.is_authenticated %}
+              <li class="nav__item {% if url_name == 'follow_index' %}nav__item_active{% endif %}">
+                <a href="{% url 'follow_index' %}" class="nav__link link">Мои подписки</a>
+              </li>
+              <li class="nav__item {% if url_name == 'new_recipe' %}nav__item_active{% endif %}">
+                <a href="{% url 'new_recipe' %}" class="nav__link link">Создать рецепт</a>
+              </li>
+              <li class="nav__item {% if url_name == 'favorite' %}nav__item_active{% endif %}">
+                <a href="{% url 'favorite' %}" class="nav__link link">Избранное</a>
+              </li>
+              <li class="nav__item {% if url_name == 'shop_list' %}nav__item_active{% endif %}">
+                <a href="{% url 'shop_list' %}" class="nav__link link">Список покупок</a>
+                <span class="badge badge_style_blue nav__badge" id="counter">{{ user.purchases.count }}</span>
+              </li>
+            {% endif %}
+          </ul>
+          <ul class="nav__items list">
+            {% if user.is_authenticated %}
+              <li class="nav__item"><a href="{% url 'password_change' %}" class="nav__link link">Изменить пароль</a></li>
+              <li class="nav__item"><a href="{% url 'logout' %}" class="nav__link link">Выход</a></li>
+            {% else %}
+              <li class="nav__item"><a href="{% url 'login' %}" class="nav__link link">Войти</a></li>
+              <li class="nav__item"><a href="{% url 'signup' %}" class="button button_style_blue">Создать аккаунт</a></li>
+            {% endif %}
+          </ul>
+      </div>
+    </nav>
+  </header>
+
+  <main class="main container">
+    {% block content %}
+      <!-- Содержимое страницы -->
+    {% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer__container container">
+      <a href="{% url 'index' %}" class="footer__brand link">Продуктовый помощник</a>
+      <ul class="footer__items">
+        <li class="footer__item"><a href="#" class="footer__link link">Об авторе </a></li>
+        <li class="footer__item"><a href="#" class="footer__link link">Технологии</a></li>
+      </ul>
     </div>
-  </nav>
-</header>
+  </footer>
 
-<main class="main container">
-  {% block content %}
-    <!-- Содержимое страницы -->
+  {% block js %}
+    <!-- JavaScript -->
   {% endblock %}
-</main>
 
-<footer class="footer">
-  <div class="footer__container container">
-    <a href="{% url 'index' %}" class="footer__brand link">Продуктовый помощник</a>
-    <ul class="footer__items">
-      <li class="footer__item"><a href="#" class="footer__link link">Об авторе </a></li>
-      <li class="footer__item"><a href="#" class="footer__link link">Технологии</a></li>
-    </ul>
-  </div>
-</footer>
-
-{% block js %}
-  <!-- JavaScript -->
-{% endblock %}
-
-</body>
+  </body>
+{% endwith %}
 </html>
