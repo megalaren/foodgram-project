@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Count, F
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -16,18 +17,23 @@ from api.models import Favorite, Follow, Purchase
 
 User = get_user_model()
 
+PER_PAGE = 6
+
 
 def index(request):
     recipes = Recipe.objects.select_related('author')
     all_tags = Tag.objects.all()
     recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
-
     user = request.user
     if user.is_authenticated:
         recipes = get_recipes_for_index(recipes, user)
 
+    paginator = Paginator(recipes, PER_PAGE)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'recipes/index.html', {
-        'recipes': recipes,
+        'page': page,
+        'paginator': paginator,
         'all_tags': all_tags,
         'active_tags': active_tags,
     })
@@ -41,8 +47,13 @@ def favorite(request):
     all_tags = Tag.objects.all()
     recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
     recipes = get_recipes_for_index(recipes, user)
+
+    paginator = Paginator(recipes, PER_PAGE)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'recipes/favorite.html', {
-        'recipes': recipes,
+        'page': page,
+        'paginator': paginator,
         'all_tags': all_tags,
         'active_tags': active_tags,
     })
@@ -55,8 +66,12 @@ def follow_index(request):
         recipes_count=Count('recipes'))
     all_tags = Tag.objects.all()
 
+    paginator = Paginator(authors, PER_PAGE)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'recipes/myFollow.html', {
-        'authors': authors,
+        'page': page,
+        'paginator': paginator,
         'all_tags': all_tags,
     })
 
@@ -73,11 +88,15 @@ def profile(request, username):
         recipes = get_recipes_for_index(recipes, user)
         is_follow = Follow.objects.filter(user=user, author=author).exists()
 
+    paginator = Paginator(recipes, PER_PAGE)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     return render(request, 'recipes/authorRecipe.html', {
         'all_tags': all_tags,
         'author': author,
         'is_follow': is_follow,
-        'recipes': recipes,
+        'page': page,
+        'paginator': paginator,
         'active_tags': active_tags,
     })
 
