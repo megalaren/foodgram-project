@@ -12,19 +12,27 @@ def add_class(field, css):
 
 
 @register.filter
-def get_request_params(request, tag):
+def get_tags_params(request, tag):
     """Возвращает закодированную строку параметров для фильтрации по тегам."""
-    tags = request.GET.getlist('tags')
+    result = request.GET.copy()
+    tags = result.getlist('tags')
     if not tags:
         # Если в запросе нет тегов, значит считаем, что выбраны все теги
         tags = [str(tag.id) for tag in Tag.objects.all()]
     if str(tag.id) not in tags:
-        tags.append(tag.id)
+        tags.append(str(tag.id))
     else:
         # убираем все повторения этого тега
         tags = [tag_id for tag_id in tags if tag_id != str(tag.id)]
-    if not tags:
-        return ''
-    result = QueryDict(mutable=True)
     result.setlist('tags', tags)
+    if not result:
+        return ''
+    return f'?{result.urlencode()}'
+
+
+@register.filter
+def get_page_param(request, page):
+    """Возвращает закодированную строку параметров для паджинации."""
+    result = request.GET.copy()
+    result['page'] = page
     return f'?{result.urlencode()}'

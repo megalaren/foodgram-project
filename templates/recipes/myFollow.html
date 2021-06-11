@@ -13,7 +13,7 @@
   </div>
 
   <div class="card-list">
-    {% for author in authors %}
+    {% for author in page %}
 
       <div class="card-user" data-author="{{ author.id }}">
         <div class="card-user__header">
@@ -52,7 +52,9 @@
 
     {% endfor %}
   </div>
-
+    {% if page.has_other_pages %}
+      {% include "paginator.html" with items=page paginator=paginator url_name=url_name %}
+    {% endif %}
 {% endblock %}
 
 {% block js %}
