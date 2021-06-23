@@ -2,8 +2,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.response import Response
 
-from .models import Favorite, Follow, Purchase
 from recipes.models import Ingredient
+
+from .models import Favorite, Follow, Purchase
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, PurchaseSerializer)
 

@@ -3,17 +3,16 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, F
 from django.http import FileResponse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
+
+from api.models import Favorite, Follow, Purchase
 
 from .forms import RecipeForm
 from .models import Recipe, Tag
-from .utils import (
-    get_ingredients_from_recipe, get_ingredients_from_request,
-    get_shop_list_pdf_binary, get_tag_filtered_recipes, get_tags_from_request,
-    get_recipes_for_index, save_ingredients_and_tags
-)
-
-from api.models import Favorite, Follow, Purchase
+from .utils import (get_ingredients_from_recipe, get_ingredients_from_request,
+                    get_recipes_for_index, get_shop_list_pdf_binary,
+                    get_tag_filtered_recipes, get_tags_from_request,
+                    save_ingredients_and_tags)
 
 User = get_user_model()
 

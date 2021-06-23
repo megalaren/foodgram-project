@@ -6,9 +6,9 @@ from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef
 from fpdf import FPDF
 
-from .models import Ingredient, RecipeIngredient, Tag
 from api.models import Favorite, Purchase
 
+from .models import Ingredient, RecipeIngredient, Tag
 
 INVALID_QUANTITY = 'Неправильно задано количество у ингредиента {title}.'
 INGREDIENT_DOES_NOT_EXIST = 'Ингредиента {title} не существует.'
@@ -46,11 +46,10 @@ def get_recipes_for_index(recipes, user):
         user=user,
         recipe=OuterRef('pk')
     )
-    recipes = recipes.annotate(
+    return recipes.annotate(
         is_favorite=Exists(favorites_recipes)).annotate(
         is_purchase=Exists(purchases_recipes)
     )
-    return recipes
 
 
 def get_tags_from_request(request, all_tags):
@@ -158,8 +157,8 @@ def get_shop_list_pdf_binary(ingredients):
     for index, title in enumerate(keys):
         pdf.cell(10, HEIGHT, f'{index + 1}.', 1, 0, 'C', )
         pdf.cell(140, HEIGHT, title, 1, 0, 'L', )
-
-        text = f'{ingredients[title]["quantity"]} {ingredients[title]["dimension"]}'
+        text = (f'{ingredients[title]["quantity"]} '
+                f'{ingredients[title]["dimension"]}')
         pdf.cell(30, HEIGHT, text, 1, 1, 'C', )
 
     pdf.cell(180, HEIGHT, '', 0, 1, 'C', )
