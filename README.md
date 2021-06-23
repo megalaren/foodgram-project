@@ -1,6 +1,9 @@
-![Status workflow](https://github.com/megalaren/yamdb_final/actions/workflows/yamdb_workflow.yaml/badge.svg)
+![Status workflow](https://github.com/megalaren/foodgram-project/actions/workflows/yamdb_workflow.yaml/badge.svg)
 
 ## Проект FoodGram
+Онлайн-сервис, где пользователи могут публиковать рецепты, подписываться на публикации других пользователей, 
+добавлять понравившиеся рецепты в список «Избранное», а перед походом в магазин скачивать сводный список продуктов, 
+необходимых для приготовления одного или нескольких выбранных блюд.
 
 
 ### Инструкция по установке и запуску проекта
@@ -23,7 +26,7 @@
 ```python manage.py createsuperuser```
 - Соберите статику:  
 ```python manage.py collectstatic --no-input```
-- Копировать картинки:
+- Копировать картинки:  
 ```cp -r static/images/recipes/ media/```
 
 Теперь проект полностью готов.
@@ -34,13 +37,14 @@
 
 ### Используемые технологии 
 - [Python 3.8.5](https://www.python.org/)
-- [Django 3.0.5](https://www.djangoproject.com/)
-- [Django REST framework 3.11.0](https://www.django-rest-framework.org/)
+- [Django 3.2.3](https://www.djangoproject.com/)
+- [Django REST framework 3.12.4](https://www.django-rest-framework.org/)
 - [Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/)
 - [Nginx](https://nginx.org/)
 - [Gunicorn 20.0.4](https://gunicorn.org/)
 - [PostgreSQL 12.4](https://www.postgresql.org/)
 - [Docker 20.10.6](https://www.docker.com/)
 
-### Лицензия
-[BSD-3-Clause License](https://github.com/megalaren/infra_sp2/blob/master/LICENSE)
+[comment]: <> (### Лицензия)
+
+[comment]: <> ([BSD-3-Clause License]&#40;https://github.com/megalaren/infra_sp2/blob/master/LICENSE&#41;)
