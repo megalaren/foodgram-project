@@ -133,3 +133,5 @@ dmypy.json
 
 media/
 sent_emails/
+
+fonts/*.pkl
