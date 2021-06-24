@@ -1,4 +1,4 @@
-![Status workflow](https://github.com/megalaren/foodgram-project/actions/workflows/yamdb_workflow.yaml/badge.svg)
+![Status workflow](https://github.com/megalaren/foodgram-project/actions/workflows/foodgram.yaml/badge.svg)
 
 ## Проект FoodGram
 Онлайн-сервис, где пользователи могут публиковать рецепты, подписываться на публикации других пользователей, 
@@ -38,14 +38,9 @@
 
 ### Используемые технологии 
 - [Python 3.8.5](https://www.python.org/)
-- [Django 3.2.3](https://www.djangoproject.com/)
+- [Django 3.2.4](https://www.djangoproject.com/)
 - [Django REST framework 3.12.4](https://www.django-rest-framework.org/)
-- [Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/)
 - [Nginx](https://nginx.org/)
 - [Gunicorn 20.0.4](https://gunicorn.org/)
 - [PostgreSQL 12.4](https://www.postgresql.org/)
 - [Docker 20.10.6](https://www.docker.com/)
-
-[comment]: <> (### Лицензия)
-
-[comment]: <> ([BSD-3-Clause License]&#40;https://github.com/megalaren/infra_sp2/blob/master/LICENSE&#41;)

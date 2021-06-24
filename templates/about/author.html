@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Об авторе{% endblock %}
+
+{% load static %}
+{% block static %}
+  <link rel="stylesheet" href="{% static 'pages/form.css' %}"> {% endblock %}
+
+{% block content %}
+
+  <div class="main__header">
+    <h1 class="main__title">Об авторе</h1>
+  </div>
+  Брюшинин Алексей<br>Выпускник 11 когорты Яндекс практикума по направлению Python-разработчик.<br>
+  Учу python и django. Мой <a href="https://github.com/megalaren/">GitHub</a>.
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Технологии{% endblock %}
+
+{% load static %}
+{% block static %}
+  <link rel="stylesheet" href="{% static 'pages/index.css' %}"> {% endblock %}
+
+{% block content %}
+
+  <div class="main__header">
+    <h1 class="main__title">Технологии</h1>
+  </div>
+
+  <ul>
+    <li><a href="https://www.python.org/">Python 3.8.5</a></li>
+    <li><a href="https://www.djangoproject.com/">Django 3.2.4</a></li>
+    <li><a href="https://www.django-rest-framework.org/">Django REST framework 3.12.4</a></li>
+    <li><a href="https://nginx.org/">Nginx</a></li>
+    <li><a href="https://gunicorn.org/">Gunicorn 20.0.4</a></li>
+    <li><a href="https://www.postgresql.org/">PostgreSQL 12.4</a></li>
+    <li><a href="https://www.docker.com/">Docker 20.10.6</a></li>
+  </ul>
+
+{% endblock %}
