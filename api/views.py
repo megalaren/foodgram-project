@@ -50,7 +50,7 @@ class FavoriteViewSet(CreateDestroyViewSet):
     serializer_class = FavoriteSerializer
 
     def get_queryset(self):
-        return Favorite.objects.filter(user=self.request.user)
+        return self.request.user.favorites.all()
 
 
 class FollowViewSet(CreateDestroyViewSet):
@@ -58,7 +58,7 @@ class FollowViewSet(CreateDestroyViewSet):
     serializer_class = FollowSerializer
 
     def get_queryset(self):
-        return Follow.objects.filter(user=self.request.user)
+        return self.request.user.follower.all()
 
 
 class PurchaseViewSet(CreateDestroyViewSet):
@@ -66,4 +66,4 @@ class PurchaseViewSet(CreateDestroyViewSet):
     serializer_class = PurchaseSerializer
 
     def get_queryset(self):
-        return Purchase.objects.filter(user=self.request.user)
+        return self.request.user.purchases.all()

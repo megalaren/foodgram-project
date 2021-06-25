@@ -26,9 +26,9 @@ FONT_FILE = os.path.join(fonts, 'DejaVuSansCondensed.ttf')
 BOLD_FONT_FILE = os.path.join(fonts, 'DejaVuSansCondensed-Bold.ttf')
 
 
-def get_tag_filtered_recipes(request, recipes, all_tags):
+def get_tag_filtered_recipes(request, recipes):
     """Возвращает отфильтрованные по тегам рецепты и список тегов."""
-    active_tags = all_tags
+    active_tags = Tag.objects.all()
     tags = request.GET.getlist('tags')
     if tags:
         active_tags = active_tags.filter(id__in=tags)
@@ -52,9 +52,9 @@ def get_recipes_for_index(recipes, user):
     )
 
 
-def get_tags_from_request(request, all_tags):
-    """Возвращает тэги из all_tags, slug которых есть в request."""
-    slugs_of_tags = [tag.slug for tag in all_tags]
+def get_tags_from_request(request):
+    """Возвращает теги, slug которых есть в request.POST."""
+    slugs_of_tags = Tag.objects.values_list('slug', flat=True)
     keys = [key for key in request.POST if key in slugs_of_tags]
     return Tag.objects.filter(slug__in=keys)
 
@@ -76,7 +76,7 @@ def get_ingredients_from_recipe(recipe):
 
 
 def get_ingredients_from_request(request, form):
-    """Получает из request ингредиенты, их количество и id для шаблона.
+    """Получает из request.POST ингредиенты, их количество и id для шаблона.
 
     Добавляет ошибки в форму.
     """
@@ -125,7 +125,7 @@ def get_ingredients_from_request(request, form):
 
 
 def save_ingredients_and_tags(recipe, ingredients, tags):
-    """Сохраняет тэги и ингредиенты в рецепт."""
+    """Сохраняет теги и ингредиенты в рецепт."""
     recipe.tags.clear()
     recipe.ingredients.clear()
     for tag in tags:

@@ -40,7 +40,7 @@
         <div class="form__field-group">
           <div class="tags">
 
-            {% for tag in all_tags %}
+            {% for tag in request|get_all_tags %}
               <div class="tags__item">
                 <input type="checkbox" name="{{ tag.slug }}" id="id_{{ tag.slug }}"
                        class="tags__checkbox tags__checkbox_style_{{ tag.color }}"

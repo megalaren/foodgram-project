@@ -11,13 +11,20 @@ def add_class(field, css):
 
 
 @register.filter
+def get_all_tags(request):
+    return Tag.objects.all()
+
+
+@register.filter
 def get_tags_params(request, tag):
     """Возвращает закодированную строку параметров для фильтрации по тегам."""
     result = request.GET.copy()
     tags = result.getlist('tags')
     if not tags:
         # Если в запросе нет тегов, значит считаем, что выбраны все теги
-        tags = [str(tag.id) for tag in Tag.objects.all()]
+        tags = [
+            str(tag_id) for tag_id in Tag.objects.values_list('id', flat=True)
+        ]
     if str(tag.id) not in tags:
         tags.append(str(tag.id))
     else:
@@ -31,7 +38,7 @@ def get_tags_params(request, tag):
 
 @register.filter
 def get_page_param(request, page):
-    """Возвращает закодированную строку параметров для паджинации."""
+    """Возвращает закодированную строку параметров для пагинации."""
     result = request.GET.copy()
     result['page'] = page
     return f'?{result.urlencode()}'

@@ -14,21 +14,25 @@ class Color(models.TextChoices):
 
 class Tag(models.Model):
     name = models.CharField(
-        verbose_name='Имя тега',
         max_length=50,
+        verbose_name='Имя тега',
     )
     slug = models.SlugField(
-        verbose_name='Slug',
         max_length=50,
         unique=True,
+        verbose_name='Slug',
     )
     # get_color_display() - получить удобно читаемый цвет
     color = models.CharField(
-        verbose_name='Цвет',
-        max_length=20,
         choices=Color.choices,
         default=Color.GREEN,
+        max_length=20,
+        verbose_name='Цвет',
     )
+
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
 
     def __str__(self):
         return self.name
@@ -36,13 +40,17 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     title = models.CharField(
-        verbose_name='Название ингредиента',
         max_length=50,
+        verbose_name='Название ингредиента',
     )
     dimension = models.CharField(
-        verbose_name='Единица измерения',
         max_length=50,
+        verbose_name='Единица измерения',
     )
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return self.title
@@ -51,51 +59,54 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
-        verbose_name='Автор рецепта',
         on_delete=models.CASCADE,
         related_name='recipes',
+        verbose_name='Автор рецепта',
     )
     title = models.CharField(
-        verbose_name='Название рецепта',
         max_length=100,
+        verbose_name='Название рецепта',
     )
     description = models.TextField(
         verbose_name='Описание рецепта',
     )
     pub_date = models.DateTimeField(
-        'Дата публикации',
         auto_now_add=True,
+        verbose_name='Дата публикации',
     )
     tags = models.ManyToManyField(
         Tag,
-        verbose_name='Теги',
         blank=True,
         related_name='recipes',
+        verbose_name='Теги',
     )
     image = models.ImageField(
-        upload_to='recipes/',
         help_text='Можете добавить картинку',
+        upload_to='recipes/',
+        verbose_name='Картинка',
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления в минутах',
         validators=[MinValueValidator(0)],
+        verbose_name='Время приготовления в минутах',
     )
     ingredients = models.ManyToManyField(
         Ingredient,
+        blank=True,
         through='RecipeIngredient',
         verbose_name='Ингредиент',
-        blank=True,
     )
 
-    @admin.display()
+    @admin.display(description='Теги')
     def get_tags(self):
         result = ''
-        for tag in self.tags.all():
-            result += tag.name + '\n'
+        for tag_name in self.tags.values_list('name', flat=True):
+            result += tag_name + '\n'
         return result
 
     class Meta:
         ordering = ('-pub_date',)
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
     def __str__(self):
         return self.title
@@ -105,24 +116,29 @@ class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Рецепт',
         related_name='ingredients_count',
+        verbose_name='Рецепт',
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
         verbose_name='Ингредиент'
-
     )
     quantity = models.PositiveSmallIntegerField(
-        verbose_name='Количество',
         null=True,
         validators=[
-            MinValueValidator(0)]
+            MinValueValidator(0)],
+        verbose_name='Количество',
     )
 
     class Meta:
-        unique_together = ('ingredient', 'recipe')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['ingredient', 'recipe', ],
+                name='unique_ingredient_in_recipe'),
+        ]
+        verbose_name = 'Связь рецепт-ингредиент'
+        verbose_name_plural = 'Связи рецепт-ингредиент'
 
     @admin.display()
     def dimension(self):

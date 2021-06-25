@@ -6,7 +6,7 @@ urlpatterns = [
     path('password_change/',
          views.CustomPasswordChangeView.as_view(),
          name='password_change'),
-    path('reset/<uidb64>/<token>/',
+    path('reset/<str:uidb64>/<str:token>/',
          views.CustomPasswordResetConfirmView.as_view(),
          name='password_reset_confirm'),
     path('signup/',

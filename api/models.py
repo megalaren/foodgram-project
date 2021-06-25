@@ -9,52 +9,70 @@ User = get_user_model()
 class Follow(models.Model):
     author = models.ForeignKey(
         User,
-        verbose_name='Автор',
         on_delete=models.CASCADE,
         related_name='following',
+        verbose_name='Автор',
     )
     user = models.ForeignKey(
         User,
-        verbose_name='Пользователь',
         on_delete=models.CASCADE,
         related_name='follower',
+        verbose_name='Пользователь',
     )
 
     class Meta:
-        unique_together = ('author', 'user')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'user', ],
+                name='unique_follow'),
+        ]
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
 
 
 class Favorite(models.Model):
     recipe = models.ForeignKey(
         Recipe,
-        verbose_name='Рецепт',
         on_delete=models.CASCADE,
         related_name='favorites',
+        verbose_name='Рецепт',
     )
     user = models.ForeignKey(
         User,
-        verbose_name='Пользователь',
         on_delete=models.CASCADE,
         related_name='favorites',
+        verbose_name='Пользователь',
     )
 
     class Meta:
-        unique_together = ('recipe', 'user')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user', ],
+                name='unique_favorite'),
+        ]
+        verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранные'
 
 
 class Purchase(models.Model):
     user = models.ForeignKey(
         User,
-        verbose_name='Пользователь',
         on_delete=models.CASCADE,
         related_name='purchases',
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
+        related_name='purchases',
         verbose_name='Рецепт',
-        related_name='purchases'
     )
 
     class Meta:
-        unique_together = ('recipe', 'user')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'user', ],
+                name='unique_purchase'),
+        ]
+        verbose_name = 'Покупка'
+        verbose_name_plural = 'Покупки'

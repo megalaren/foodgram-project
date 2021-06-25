@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from api.models import Favorite, Follow, Purchase
 
 from .forms import RecipeForm
-from .models import Recipe, Tag
+from .models import Ingredient, Recipe, RecipeIngredient
 from .utils import (get_ingredients_from_recipe, get_ingredients_from_request,
                     get_recipes_for_index, get_shop_list_pdf_binary,
                     get_tag_filtered_recipes, get_tags_from_request,
@@ -21,8 +21,7 @@ PER_PAGE = 6
 
 def index(request):
     recipes = Recipe.objects.select_related('author')
-    all_tags = Tag.objects.all()
-    recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
+    recipes, active_tags = get_tag_filtered_recipes(request, recipes)
     user = request.user
     if user.is_authenticated:
         recipes = get_recipes_for_index(recipes, user)
@@ -33,7 +32,6 @@ def index(request):
     return render(request, 'recipes/index.html', {
         'page': page,
         'paginator': paginator,
-        'all_tags': all_tags,
         'active_tags': active_tags,
     })
 
@@ -43,8 +41,7 @@ def favorite(request):
     user = request.user
     recipes = Recipe.objects.filter(
         favorites__user=user).select_related('author')
-    all_tags = Tag.objects.all()
-    recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
+    recipes, active_tags = get_tag_filtered_recipes(request, recipes)
     recipes = get_recipes_for_index(recipes, user)
 
     paginator = Paginator(recipes, PER_PAGE)
@@ -53,7 +50,6 @@ def favorite(request):
     return render(request, 'recipes/favorite.html', {
         'page': page,
         'paginator': paginator,
-        'all_tags': all_tags,
         'active_tags': active_tags,
     })
 
@@ -63,7 +59,6 @@ def follow_index(request):
     authors = User.objects.filter(
         following__user=request.user).prefetch_related('recipes').annotate(
         recipes_count=Count('recipes'))
-    all_tags = Tag.objects.all()
 
     paginator = Paginator(authors, PER_PAGE)
     page_number = request.GET.get('page')
@@ -71,15 +66,13 @@ def follow_index(request):
     return render(request, 'recipes/myFollow.html', {
         'page': page,
         'paginator': paginator,
-        'all_tags': all_tags,
     })
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
     recipes = author.recipes.all()
-    all_tags = Tag.objects.all()
-    recipes, active_tags = get_tag_filtered_recipes(request, recipes, all_tags)
+    recipes, active_tags = get_tag_filtered_recipes(request, recipes)
 
     user = request.user
     is_follow = False
@@ -91,7 +84,6 @@ def profile(request, username):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return render(request, 'recipes/authorRecipe.html', {
-        'all_tags': all_tags,
         'author': author,
         'is_follow': is_follow,
         'page': page,
@@ -102,31 +94,24 @@ def profile(request, username):
 
 @login_required
 def new_recipe(request):
-    all_tags = Tag.objects.all()
-    if request.method != 'POST':
-        return render(request, 'recipes/formRecipe.html', {
-            'form': RecipeForm(),
-            'all_tags': all_tags,
-            'new_recipe': True,
-        })
     form = RecipeForm(request.POST or None, files=request.FILES or None, )
-    recipe_tags = get_tags_from_request(request, all_tags)
-    ingredients, form = get_ingredients_from_request(request, form)
+    recipe_tags = ingredients = []
+    if request.method == 'POST':
+        recipe_tags = get_tags_from_request(request)
+        ingredients, form = get_ingredients_from_request(request, form)
 
-    if not form.is_valid():
-        return render(request, 'recipes/formRecipe.html', {
-            'all_tags': all_tags,
-            'form': form,
-            'ingredients': ingredients,
-            'recipe_tags': recipe_tags,
-            'new_recipe': True,
-        })
-    # если валидна, то сохраняем рецепт и добавляем в него тэги и ингредиенты
-    recipe = form.save(commit=False)
-    recipe.author = request.user
-    recipe.save()
-    save_ingredients_and_tags(recipe, ingredients, recipe_tags)
-    return redirect('recipe', recipe.id)
+    if form.is_valid():
+        recipe = form.save(commit=False)
+        recipe.author = request.user
+        recipe.save()
+        save_ingredients_and_tags(recipe, ingredients, recipe_tags)
+        return redirect('recipe', recipe.id)
+    return render(request, 'recipes/formRecipe.html', {
+        'form': form,
+        'ingredients': ingredients,
+        'recipe_tags': recipe_tags,
+        'new_recipe': True,
+    })
 
 
 @login_required()
@@ -134,40 +119,28 @@ def recipe_edit(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     if request.user != recipe.author:
         return redirect('recipe', recipe_id)
-
     form = RecipeForm(
         request.POST or None,
         files=request.FILES or None,
         instance=recipe
     )
-    all_tags = Tag.objects.all()
     if request.method != 'POST':
         ingredients = get_ingredients_from_recipe(recipe)
         recipe_tags = recipe.tags.all()
-        return render(request, 'recipes/formRecipe.html', {
-            'all_tags': all_tags,
-            'form': form,
-            'ingredients': ingredients,
-            'recipe_tags': recipe_tags,
-            'recipe_id': recipe_id,
-        })
+    else:
+        recipe_tags = get_tags_from_request(request)
+        ingredients, form = get_ingredients_from_request(request, form)
 
-    recipe_tags = get_tags_from_request(request, all_tags)
-    ingredients, form = get_ingredients_from_request(request, form)
-
-    if not form.is_valid():
-        return render(request, 'recipes/formRecipe.html', {
-            'all_tags': all_tags,
-            'form': form,
-            'ingredients': ingredients,
-            'recipe_tags': recipe_tags,
-            'recipe_id': recipe_id,
-        })
-    # если валидна, то сохраняем рецепт и добавляем в него тэги и ингредиенты
-    recipe = form.save(commit=False)
-    recipe.save()
-    save_ingredients_and_tags(recipe, ingredients, recipe_tags)
-    return redirect('recipe', recipe.id)
+    if form.is_valid():
+        recipe = form.save()
+        save_ingredients_and_tags(recipe, ingredients, recipe_tags)
+        return redirect('recipe', recipe.id)
+    return render(request, 'recipes/formRecipe.html', {
+        'form': form,
+        'ingredients': ingredients,
+        'recipe_tags': recipe_tags,
+        'recipe_id': recipe_id,
+    })
 
 
 @login_required
@@ -175,11 +148,9 @@ def recipe_delete(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
     if recipe.author != request.user:
         return redirect('recipe', recipe_id)
-    all_tags = Tag.objects.all()
     title = recipe.title
     recipe.delete()
     return render(request, 'recipes/recipe_delete_done.html', {
-        'all_tags': all_tags,
         'title': title,
     })
 
@@ -224,35 +195,27 @@ def shop_list(request):
 
 @login_required
 def shop_list_download(request):
-    ingredients = {}
+    ingredients_sum = {}
     recipes = Recipe.objects.filter(purchases__user=request.user)
-    for recipe in recipes:
-        for recipe_ingredient in recipe.ingredients_count.all():
-            title = recipe_ingredient.ingredient.title
-            if title not in ingredients:
-                ingredients[title] = {
-                    'quantity': recipe_ingredient.quantity,
-                    'dimension': recipe_ingredient.ingredient.dimension,
-                }
-            else:
-                ingredients[title]['quantity'] += recipe_ingredient.quantity
+    ingredients = RecipeIngredient.objects.filter(
+        recipe__in=recipes
+    ).values_list(
+        'ingredient__title',
+        'quantity',
+        'ingredient__dimension',
+        named=True
+    )
 
+    for ingredient in ingredients:
+        title = ingredient.ingredient__title
+        if title not in ingredients_sum:
+            ingredients_sum[title] = {
+                'quantity': ingredient.quantity,
+                'dimension': ingredient.ingredient__dimension, }
+        else:
+            ingredients_sum[title]['quantity'] += ingredient.quantity
     return FileResponse(
-        get_shop_list_pdf_binary(ingredients),
+        get_shop_list_pdf_binary(ingredients_sum),
         filename='Shop_list.pdf',
         as_attachment=True
     )
-
-
-def page_not_found(request, exception=None):
-    # Переменная exception содержит отладочную информацию,
-    # выводить её в шаблон пользователской страницы 404 не нужно
-    return render(request, '404.html', {
-        'path': request.path
-    },
-        status=404
-    )
-
-
-def server_error(request):
-    return render(request, '500.html', status=500)

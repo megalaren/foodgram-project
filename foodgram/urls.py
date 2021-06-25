@@ -4,8 +4,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-handler404 = 'recipes.views.page_not_found'  # noqa
-handler500 = 'recipes.views.server_error'  # noqa
+handler404 = 'foodgram.views.page_not_found'  # noqa
+handler500 = 'foodgram.views.server_error'  # noqa
 
 urlpatterns = [
     path('about/', include('about.urls', namespace='about')),
