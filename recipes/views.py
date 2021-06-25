@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from api.models import Favorite, Follow, Purchase
 
 from .forms import RecipeForm
-from .models import Ingredient, Recipe, RecipeIngredient
+from .models import Recipe, RecipeIngredient
 from .utils import (get_ingredients_from_recipe, get_ingredients_from_request,
                     get_recipes_for_index, get_shop_list_pdf_binary,
                     get_tag_filtered_recipes, get_tags_from_request,

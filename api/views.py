@@ -4,7 +4,6 @@ from rest_framework.response import Response
 
 from recipes.models import Ingredient
 
-from .models import Favorite, Follow, Purchase
 from .serializers import (FavoriteSerializer, FollowSerializer,
                           IngredientSerializer, PurchaseSerializer)
 
