@@ -47,19 +47,21 @@
           {% endif %}
         </ul>
       </div>
-      <ul class="single-card__items">
-        <li class="single-card__item">
-          {% if is_purchase %}
-            <button class="button button_style_light-blue-outline" name="purchases">
-              <span class="icon-check button__icon"></span> Рецепт добавлен
-            </button>
-          {% else %}
-            <button class="button button_style_blue" name="purchases" data-out>
-              <span class="icon-plus button__icon"></span>Добавить в покупки
-            </button>
-          {% endif %}
-        </li>
-        {% if user.is_authenticated %}
+
+      {% if user.is_authenticated %}
+        <ul class="single-card__items">
+          <li class="single-card__item">
+            {% if is_purchase %}
+              <button class="button button_style_light-blue-outline" name="purchases">
+                <span class="icon-check button__icon"></span> Рецепт добавлен
+              </button>
+            {% else %}
+              <button class="button button_style_blue" name="purchases" data-out>
+                <span class="icon-plus button__icon"></span>Добавить в покупки
+              </button>
+            {% endif %}
+          </li>
+
           <li class="single-card__item">
             {% if is_follow %}
               <button class="button button_style_light-blue button_size_subscribe" name="subscribe">
@@ -69,10 +71,11 @@
               <button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>
                 Подписаться на автора
               </button>
+              </li>
             {% endif %}
-          </li>
-        {% endif %}
-      </ul>
+        </ul>
+      {% endif %}
+
       <div class="single-card__section">
         <h3 class="single-card__section-title">Ингредиенты:</h3>
         <div class="single-card__items single-card__items_column">
