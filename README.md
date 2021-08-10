@@ -34,7 +34,7 @@
 ***
 ### Об авторе  
 Брюшинин Алексей  
-<aleksei.briushinin@yandex.ru>
+<megalaren@mail.ru>
 
 ### Используемые технологии 
 - [Python 3.8.5](https://www.python.org/)
